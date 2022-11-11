@@ -1,4 +1,5 @@
 import numpy.polynomial.polynomial as poly
+import numpy as np
 
 def polyKofaktor(M):
     # M adalah sebuah matriks persegi
@@ -48,7 +49,7 @@ def eigenValue(A):
     # i : int
 
     # ALGORITMA
-    eigMat = [X for X in A]  # buat matriks A - λI
+    eigMat = [[El for El in ROW] for ROW in A]  # buat matriks A - λI
     for i in range(0,len(eigMat)):  # Karena eigMat adalah matriks persegi, jumlah baris dan kolom sama
         eigMat[i][i] = (eigMat[i][i], -1)
     
