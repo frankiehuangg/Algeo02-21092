@@ -72,7 +72,8 @@ def eigenVectors(A, eigVal):
     # KAMUS LOKAL
     # M, lmdI, ret : float[][]
     # R : (float[][], int[])    # value hasil method sp.rref()
-    # n, i, j, t : int
+    # n, npivot : int
+    # i, j : int
     # r, c, rpivot : int
     # prec = int
 
@@ -123,14 +124,38 @@ def eigenVectors(A, eigVal):
             break
         else:
             prec = prec - 1
-        
-    n = dim-r   # jumlah vektor basis adalah dimensi matriks - jumlah baris bukan 0
-    ret = [[0 for i in range(dim)] for j in range(n)]
-    t = 0
-    for i in range(dim):
-        if(Mtemp[i][i] == 0):
-            ret[t] = [-Mtemp[j][i] for j in range(dim)]
-            ret[t][i] = 1
+    # iterasi selesai
+
+    r = 0; c = 0
+    while (r < dim and c < dim):
+        if (Mtemp[r][c] != 0):
+            r = r+1
+        c = c+1
+    # end while
+    if (r == 0):
+        ret = [0 for i in range(dim)]
+        ret[dim-1] = 1
+    else:
+        n = dim-r   # jumlah vektor basis (null vector) adalah dimensi matriks - jumlah baris bukan 0
+        ret = [[0 for i in range(dim)] for j in range(n)]
+
+        nullcol = [0 for i in range(n)] # cari kolom null Mtemp
+        npivot = r
+        pivotcol = [0 for i in range(npivot)]   # cari kolom pivot Mtemp
+        r = 0; c = 0
+        while (r < dim and c < dim):
+            if (Mtemp[r][c] != 0):
+                pivotcol[r] = c
+                r = r+1
+            else:
+                nullcol[c-r] = c
+            c = c+1
+        # end while
+
+        for i in range(n):
+            for j in range(npivot):
+                ret[i][pivotcol[j]] = -Mtemp[j][nullcol[i]]
+            ret[i][nullcol[i]] = 1
 
     return ret
     #
