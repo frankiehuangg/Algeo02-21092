@@ -1,6 +1,5 @@
 import numpy.polynomial.polynomial as poly
 import numpy as np
-from numpy.linalg import norm
 
 def polyKofaktor(M):
     # M adalah sebuah matriks persegi
@@ -97,7 +96,7 @@ def eigenVectors1(A, eigVal):
 
     # ALGORITMA
     dim = len(A)
-    lmdI = np.identity(dim) * eigVal
+    lmdI = np.eye(dim) * eigVal
     M = [[El for El in ROW] for ROW in A]
     M = np.array(M)
     M = M - lmdI
@@ -177,35 +176,43 @@ def eigenVectors1(A, eigVal):
     return ret
     #
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # EIGENVALUE CALCULATIONS BY THE BOOK!!!
 # + NO QR DECOMPOSITION!!!
 # + NAIVE IMPLEMENTATION POSSIBLE WITH BASIC KNOWLEDGE OF EIGEN VALUE!!!
 # + IKUT KELAS ALGEO 100% WORK NO HACK REQUIRED!!!
 # - require built-in polynomial function to solve polynomial roots
 # - computationally expensive
+
+def QRsqHouseholder(A):
+    # mengembalikan Q, R; faktor A hasil dekomposisi QR
+    # QR decomposition menggunakan metode Householder Reflection
+    # reference: https://rpubs.com/aaronsc32/qr-decomposition-householder
+    #            https://en.wikipedia.org/wiki/QR_decomposition
+    #            https://statlect.com/matrix-algebra/Householder-matrix
+    #            https://ristohinno.medium.com/qr-decomposition-903e8c61eaab (complete qr decomp function in py, bruh)
+
+    dim = len(A)
+
+    Q = np.eye(dim)
+    HA = np.array([[x for x in row] for row in A])
+    for i in range(dim):
+        u = [x for x in HA[i:,i]] # u adalah vektor kolom ke-i dari submatriks (Hi x A)
+        
+        # hitung vektor 
+        if(u[0] < 0):   # buat tanda kedua nilai elemen sama untuk menghindari pembagian 0
+            u[0] = u[0] - np.linalg.norm(u)
+        else:
+            u[0] = u[0] + np.linalg.norm(u)
+
+        # normalkan vektor
+        u = u/np.linalg.norm(u)
+        
+        # hitung matriks householder H
+        H = np.eye(dim)
+
+        H[i:, i:] = np.eye(dim-i) - 2 * (u[:, None] @ u[None, :])
+
+        Q = Q @ H
+        HA = H @ HA
+
+    return Q, HA
