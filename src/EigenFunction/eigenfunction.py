@@ -1,5 +1,6 @@
 import numpy.polynomial.polynomial as poly
 import numpy as np
+from numpy.linalg import norm
 
 def polyKofaktor(M):
     # M adalah sebuah matriks persegi
@@ -39,7 +40,7 @@ def polyKofaktor(M):
     #
 
 
-def eigenValue(A):
+def eigenValue1(A):
     # A adalah sebuah matriks persegi
     # Mengembalikan nilai-nilai eigen melalui akar-akar
     # persamaan karakteristik dari A dengan metode kofaktor
@@ -47,7 +48,7 @@ def eigenValue(A):
     # KAMUS LOKAL
     # eigMat : polynomial[][]
     # charPol : polynomial
-    # i : int
+    # i, j : int
     # roots : float[]
 
     # ALGORITMA
@@ -57,21 +58,37 @@ def eigenValue(A):
     
     charPol = polyKofaktor(eigMat)
     roots =  poly.polyroots(charPol)
-    # round to nearest 16
-    roots = np.round_(roots, decimals = 16)
-    roots = [*set(roots)]
+
+    roots = list(roots)
+    roots.sort(reverse=True)
+
+    i = 0
+    while (i < len(roots)):
+        for j in range (i+1, len(roots)):
+            # maks = max(roots[j], roots[i])
+            # minn = min(roots[j], roots[i])
+            if (roots[j] > 0):
+                elmax = roots[i]
+                elmin = roots[j]
+            else:
+                elmax = roots[j]
+                elmin = roots[i]
+            if ((elmax-elmin)/elmax <= 1e-6):
+                roots[j] = roots[i]
+                i = j
+        i = i+1
+
     return roots
 
 
 
-def eigenVectors(A, eigVal):
+def eigenVectors1(A, eigVal):
     # A adalah sebuah matriks persegi
     # mengembalikan vektor-vektor basis eigen A
     # dari nilai eigen eigVal
 
     # KAMUS LOKAL
     # M, lmdI, ret : float[][]
-    # R : (float[][], int[])    # value hasil method sp.rref()
     # n, npivot : int
     # i, j : int
     # r, c, rpivot : int
@@ -159,8 +176,6 @@ def eigenVectors(A, eigVal):
 
     return ret
     #
-
-
 
 
 
