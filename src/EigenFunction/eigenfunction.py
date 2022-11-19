@@ -196,7 +196,7 @@ def QRsqHouseholder(A):
     Q = np.eye(dim)
     HA = np.array([[x for x in row] for row in A])
     for i in range(dim):
-        u = [x for x in HA[i:,i]] # u adalah vektor kolom ke-i dari submatriks (Hi x A)
+        u = np.array([x for x in HA[i:,i]]) # u adalah vektor kolom ke-i dari submatriks (Hi x A)
         
         # hitung vektor 
         if(u[0] < 0):   # buat tanda kedua nilai elemen sama untuk menghindari pembagian 0
@@ -205,7 +205,11 @@ def QRsqHouseholder(A):
             u[0] = u[0] + np.linalg.norm(u)
 
         # normalkan vektor
-        u = u/np.linalg.norm(u)
+        normal = np.linalg.norm(u)
+        if(normal == 0):
+            u[0] = 1
+        else:
+            u = u/normal
         
         # hitung matriks householder H
         H = np.eye(dim)
@@ -216,3 +220,27 @@ def QRsqHouseholder(A):
         HA = H @ HA
 
     return Q, HA
+
+def eigen(A, iteration=10000):
+    # menghasilkan array eigenvalue matriks A dan matriks vektor-vektor eigen A
+    # reference: https://www.andreinc.net/2021/01/25/computing-eigenvalues-and-eigenvectors-using-qr-decomposition
+    #            https://en.wikipedia.org/wiki/QR_algorithm
+
+    dim = len(A)
+    Ak = np.array([[x for x in row] for row in A])
+    QQ = np.eye(dim)
+
+    for i in range(iteration):
+        # gunakan metode "shift"
+        s = Ak[dim-1,dim-1] * np.eye(dim)
+
+        # dekomposisi matriks A_k yang telah dikurangi dengan "shift"
+        (Q, R) = QRsqHouseholder((Ak - s))
+
+        Ak = (R @ Q) + s    # tambahkan "shift" kembali ke matriks A_k+1
+        QQ = QQ @ Q
+
+    EigVal = [Ak[i,i] for i in range(dim)]
+
+    # Jika A adalam matriks simetris, QQ adalah matriks kolom vektor eigen dari A
+    return EigVal, QQ
