@@ -52,19 +52,29 @@ EigFace = np.transpose(EigFace)
 print("beres")
 pict = input()
 while(pict != "sex"):
-	img = im.open("../test/"+pict).convert("L")
+	img = im.open("../temp/"+pict).convert("L")
 	img = img.resize((256,256), im.BICUBIC)
 	img = np.array(img).flatten()
 
 	NewFace = img - mean_face
-	NewFace = EigVect @ NewFace
-
-	min = 9999
+    
+	k = -1
+	min = 999999999999
 	for i in range(m):
-		epsilon = np.linalg.norm(NewFace - EigFace[:,i])
-		if(epsilon < min):
+		epsilon = abs(np.dot(NewFace, faces_matrix @ EigVect[i]))
+		print(i, epsilon)
+		if (epsilon < min):
 			min = epsilon
 			k = i
+
+# 	k = -1
+# 	min = 9999999999999999999999999
+# 	for i in range(m):
+# 		epsilon = np.linalg.norm(NewFace - EigFace[:,i])
+# # 		print(epsilon < min)
+# 		if(epsilon < min):
+# 			min = epsilon
+# 			k = i
 
 	print(k)
 	pict = input()
