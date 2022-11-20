@@ -223,8 +223,8 @@ def QRsqHouseholder(A):
 
 def eigen(A, iteration=10000):
     # menghasilkan array eigenvalue matriks A dan matriks vektor-vektor eigen A
-    # reference: https://www.andreinc.net/2021/01/25/computing-eigenvalues-and-eigenvectors-using-qr-decomposition
-    #            https://en.wikipedia.org/wiki/QR_algorithm
+    # reference: https://en.wikipedia.org/wiki/QR_algorithm
+    #            https://www.andreinc.net/2021/01/25/computing-eigenvalues-and-eigenvectors-using-qr-decomposition
 
     dim = len(A)
     Ak = np.array([[x for x in row] for row in A])

@@ -1,10 +1,11 @@
 import os
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 from PIL import Image as im
 
-neutral = []
+from eigenfunction import eigen
+
+faces_matrix = []
 
 folders = os.listdir("../dataset/")
 for folder in folders:
@@ -14,12 +15,56 @@ for folder in folders:
 		img = im.open("../dataset/" + folder + "/" + pict).convert("L")
 		img = img.resize((256,256), im.BICUBIC)
 		img = np.array(img).flatten()
-		neutral.append(img)
+		faces_matrix.append(img)
 
-faces_matrix = np.vstack(neutral)
-print(faces_matrix.shape)
+# m adalah jumlah wajah dalam dataset
+m = len(faces_matrix)
 
-mean_face = np.mean(faces_matrix, axis=0).reshape(256,256)
-print(mean_face.shape)
+# faces_matrix -> M x N^2
+faces_matrix = np.vstack(faces_matrix)
 
-cv2.imwrite("output.jpg", mean_face)
+# hitung mean face
+mean_face = np.mean(faces_matrix, axis=0)
+
+# "normal"kan wajah training (face - average face)
+for i in range(m):
+	faces_matrix[i] = faces_matrix[i] - mean_face
+
+# face_matrix adalah "normal" dari wajah, bukan matriks citra wajah
+faces_matrix = np.transpose(faces_matrix)
+# faces_matrix -> N^2 x M
+
+# C = A^T x A
+C = np.transpose(faces_matrix) @ faces_matrix
+# Matriks kovarian, C -> M x M
+
+# Hitung nilai eigen dan vektor eigen C
+EigVal, EigVect = eigen(C, 8000)
+# EigVect adalah matriks dengan entri kolom ke-i vektor basis yang berkoresponden dengan nilai eigen ke-i EigVal
+
+# EigFace adalam matriks wajah-wajah eigen, dengan entri kolom adalah vektor wajah
+EigFace = []
+for i in range(m):
+	EigFace.append(faces_matrix @ EigVect[:,i])
+
+EigFace = np.transpose(EigFace)
+
+print("beres")
+pict = input()
+while(pict != "sex"):
+	img = im.open("../test/"+pict).convert("L")
+	img = img.resize((256,256), im.BICUBIC)
+	img = np.array(img).flatten()
+
+	NewFace = img - mean_face
+	NewFace = EigVect @ NewFace
+
+	min = 9999
+	for i in range(m):
+		epsilon = np.linalg.norm(NewFace - EigFace[:,i])
+		if(epsilon < min):
+			min = epsilon
+			k = i
+
+	print(k)
+	pict = input()
