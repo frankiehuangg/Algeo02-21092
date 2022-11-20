@@ -74,5 +74,14 @@ while(pict != "stop"):
 			min = epsilon
 			k = i
 
+# 	k = -1
+# 	min = 9999999999999999999999999
+# 	for i in range(m):
+# 		epsilon = np.linalg.norm(NewFace - EigFace[:,i])
+# # 		print(epsilon < min)
+# 		if(epsilon < min):
+# 			min = epsilon
+# 			k = i
+
 	print(k)
 	pict = input()
