@@ -74,7 +74,7 @@ while(pict != "stop"):
 
 	min = 999999999999
 	k = -1
-	for i in range(1, m):
+	for i in range(m):
 		epsilon = np.linalg.norm(NewFace - Om[i])
 		if(epsilon < min):
 			min = epsilon
