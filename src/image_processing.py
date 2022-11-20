@@ -47,21 +47,29 @@ EigFace = []
 for i in range(m):
 	EigFace.append(faces_matrix @ EigVect[:,i])
 
-EigFace = np.transpose(EigFace)
+EigFace = np.array(EigFace)
+# EigFace -> M x N^2
 
-print("beres")
+Om = []
+for i in range(m):
+	Om.append([np.dot(faces_matrix[:,i], u) for u in EigFace])
+
+Om = np.array(Om)
+
 pict = input()
-while(pict != "sex"):
+while(pict != "stop"):
 	img = im.open("../test/"+pict).convert("L")
 	img = img.resize((256,256), im.BICUBIC)
 	img = np.array(img).flatten()
 
 	NewFace = img - mean_face
-	NewFace = EigVect @ NewFace
+	NewFace = [np.dot(NewFace, u) for u in EigFace]
+	NewFace = np.array(NewFace)
 
-	min = 9999
-	for i in range(m):
-		epsilon = np.linalg.norm(NewFace - EigFace[:,i])
+	min = 999
+	k = -1
+	for i in range(1, m):
+		epsilon = np.linalg.norm(NewFace - Om[i])
 		if(epsilon < min):
 			min = epsilon
 			k = i
