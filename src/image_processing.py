@@ -86,7 +86,8 @@ def test_image(img, pict_name, mean_face, EigFace, Om):
 	min = 99999999
 	k = -1
 	for i in range(m):
-		epsilon = np.linalg.norm(Omk - Om[i])
+		v = Omk - Om[i]	# hitung vektor selisih
+		epsilon = np.sqrt(np.dot(v,v))	# hitung euclidean distance
 		if(epsilon < min):
 			min = epsilon
 			k = i
