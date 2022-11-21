@@ -74,11 +74,10 @@ def train_images(path):
 	return pict_name, mean_face, EigFace, Om
 
 
-def test_image(path, pict_name, mean_face, EigFace, Om):
-	img = im.open(path).convert("L")
-	img = img.resize((256,256), im.BICUBIC)
+def test_image(img, pict_name, mean_face, EigFace, Om):
+	img = img.convert("L").resize((256,256), im.BICUBIC)
 	img = np.array(img).flatten()
-
+	
 	NewFace = img - mean_face
 	Omk = [np.dot(NewFace, u) for u in EigFace]
 	Omk = np.array(Omk)
