@@ -39,20 +39,26 @@ C = np.transpose(faces_matrix) @ faces_matrix
 # Matriks kovarian, C -> M x M
 
 # Hitung nilai eigen dan vektor eigen C
-EigVal, EigVect = eigen(C, 8000)
+EigVal, EigVect = eigen(C)
 # EigVect adalah matriks dengan entri kolom ke-i vektor basis yang berkoresponden dengan nilai eigen ke-i EigVal
 
-# EigFace adalam matriks wajah-wajah eigen, dengan entri kolom adalah vektor wajah
+# EigFace adalah matriks wajah-wajah eigen, dengan entri baris adalah vektor wajah
 EigFace = []
 for i in range(m):
 	EigFace.append(faces_matrix @ EigVect[:,i])
+	EigFace[i] = EigFace[i]/(np.linalg.norm(EigFace))
 
 EigFace = np.array(EigFace)
 # EigFace -> M x N^2
 
+# for i in range(m):
+# 	for j in range(i, m):
+# 		print(np.dot(EigVect[i], EigVect[j]))
+
+# nyatakan wajah-wajah sebagai kombinasi linier dalam Om
 Om = []
 for i in range(m):
-	Om.append([np.dot(faces_matrix[:,i], u) for u in EigFace])
+	Om.append([np.dot(faces_matrix[:,i], u) for u in EigFace])	# menghasilkan konstanta kelipatan suatu vektor eigen sebagai komponennya
 
 Om = np.array(Om)
 
@@ -66,9 +72,9 @@ while(pict != "stop"):
 	NewFace = [np.dot(NewFace, u) for u in EigFace]
 	NewFace = np.array(NewFace)
 
-	min = 999
+	min = 999999999999
 	k = -1
-	for i in range(1, m):
+	for i in range(m):
 		epsilon = np.linalg.norm(NewFace - Om[i])
 		if(epsilon < min):
 			min = epsilon
