@@ -80,7 +80,8 @@ while(pict != "stop"):
 	min = 99999999
 	k = -1
 	for i in range(m):
-		epsilon = np.linalg.norm(Omk - Om[i])
+		v = Omk - Om[i]	# hitung vektor selisih
+		epsilon = np.sqrt(np.dot(v,v))	# hitung euclidean distance
 		# print(faces_norm[:,i], "\n", NewFace, "\n-------")
 		# print(faces_matrix[i], "\n", img, "\n########\n")
 		if(epsilon < min):
