@@ -8,10 +8,10 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-
+from openfile import select_file, select_dir
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"/home/frank/Documents/Github/Test/build/assets/frame0")
+ASSETS_PATH = OUTPUT_PATH / Path(r"assets/frame0")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -20,15 +20,15 @@ def relative_to_assets(path: str) -> Path:
 
 window = Tk()
 
-window.geometry("600x343")
+window.geometry("960x540")
 window.configure(bg = "#FFFFFF")
 
 
 canvas = Canvas(
     window,
     bg = "#FFFFFF",
-    height = 343,
-    width = 600,
+    height = 540,
+    width = 960,
     bd = 0,
     highlightthickness = 0,
     relief = "ridge"
@@ -38,8 +38,8 @@ canvas.place(x = 0, y = 0)
 image_image_1 = PhotoImage(
     file=relative_to_assets("image_1.png"))
 image_1 = canvas.create_image(
-    300.0,
-    194.0,
+    480.0,
+    270.0,
     image=image_image_1
 )
 
@@ -49,14 +49,14 @@ button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=select_file,
     relief="flat"
 )
 button_1.place(
-    x=41.0,
-    y=285.0,
-    width=62.0,
-    height=16.0
+    x=66.0,
+    y=448.0,
+    width=140.0,
+    height=32.0
 )
 
 button_image_2 = PhotoImage(
@@ -65,100 +65,101 @@ button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
+    command=select_dir,
     relief="flat"
 )
 button_2.place(
-    x=169.0,
-    y=285.0,
-    width=62.0,
-    height=16.0
+    x=308.0,
+    y=446.0,
+    width=140.0,
+    height=32.0
 )
 
-canvas.create_rectangle(
-    26.0,
-    265.0,
-    117.0,
-    277.0,
-    fill="#000000",
-    outline="")
+canvas.create_text(
+    301.0,
+    412.0,
+    anchor="nw",
+    text="Insert Your Dataset",
+    fill="#FFFFFF",
+    font=("K2D Light", 18 * -1)
+)
 
 canvas.create_text(
-    160.0,
-    265.0,
+    52.0,
+    412.0,
     anchor="nw",
     text="Insert Your Image\n",
     fill="#FFFFFF",
-    font=("K2D Light", 10 * -1)
+    font=("K2D Light", 18 * -1)
 )
 
 canvas.create_text(
-    313.0,
-    265.0,
+    581.0,
+    412.0,
     anchor="nw",
     text="Result",
     fill="#FFFFFF",
-    font=("K2D Light", 10 * -1)
+    font=("K2D Light", 18 * -1)
 )
 
 canvas.create_text(
-    473.0,
-    265.0,
+    777.0,
+    412.0,
     anchor="nw",
     text="Excecution Time",
     fill="#FFFFFF",
-    font=("K2D Light", 10 * -1)
+    font=("K2D Light", 18 * -1)
 )
 
-canvas.create_rectangle(
-    53.0,
-    54.0,
-    266.0,
-    211.0,
-    fill="#D9D9D9",
-    outline="")
+image_image_2 = PhotoImage(
+    file=relative_to_assets("image_2.png"))
+image_2 = canvas.create_image(
+    250.0,
+    229.0,
+    image=image_image_2
+)
 
-canvas.create_rectangle(
-    347.0,
-    54.0,
-    560.0,
-    211.0,
-    fill="#D9D9D9",
-    outline="")
+image_image_3 = PhotoImage(
+    file=relative_to_assets("image_3.png"))
+image_3 = canvas.create_image(
+    715.0,
+    229.0,
+    image=image_image_3
+)
 
 canvas.create_text(
-    260.0,
-    9.0,
+    322.0,
+    12.0,
     anchor="nw",
     text="FACE RECOGNITION",
     fill="#FFFFFF",
-    font=("Kadwa Regular", 10 * -1)
+    font=("Kadwa Regular", 32 * -1)
 )
 
 canvas.create_rectangle(
-    52.0,
-    28.0,
-    560.0,
-    32.0,
+    34.0,
+    73.0,
+    922.0,
+    76.0,
     fill="#FFFFFF",
     outline="")
 
 canvas.create_text(
-    133.0,
-    217.0,
+    202.0,
+    357.0,
     anchor="nw",
     text="Test Image",
     fill="#FFFFFF",
-    font=("Kadwa Regular", 7 * -1)
+    font=("Kadwa Regular", 18 * -1)
 )
 
 canvas.create_text(
-    436.0,
-    217.0,
+    655.0,
+    357.0,
     anchor="nw",
     text="Closest Result",
     fill="#FFFFFF",
-    font=("Kadwa Regular", 7 * -1)
+    font=("Kadwa Regular", 18 * -1)
 )
 window.resizable(False, False)
 window.mainloop()
