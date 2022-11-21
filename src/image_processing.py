@@ -5,71 +5,77 @@ from PIL import Image as im
 
 from eigenfunction import eigen
 
-faces_matrix = []
+def train_images(path):
+	faces_matrix = []
+	pict_name = []
 
-folders = os.listdir("../dataset/")
-for folder in folders:
-	picts = os.listdir("../dataset/" + folder + "/")
+	picts = os.listdir(path)
 	for pict in picts:
-		print("Processing: " + "../dataset/" + folder + "/" + pict)
-		img = im.open("../dataset/" + folder + "/" + pict).convert("L")
+		print("Processing: " + pict)
+		img = im.open(path + "/" + pict).convert("L")
 		img = img.resize((256,256), im.BICUBIC)
 		img = np.array(img).flatten()
 		faces_matrix.append(img)
+		pict_name.append(path + "/" + pict)
 
-# m adalah jumlah wajah dalam dataset
-m = len(faces_matrix)
+	pict_name = np.array(pict_name)
 
-# faces_matrix -> M x N^2
-faces_matrix = np.array(faces_matrix)
+	# m adalah jumlah wajah dalam dataset
+	m = len(faces_matrix)
 
-# hitung mean face
-mean_face = np.mean(faces_matrix, axis=0)
+	# faces_matrix -> M x N^2
+	faces_matrix = np.array(faces_matrix)
 
-faces_norm = []
-# "normal"kan wajah training (face - average face)
-for i in range(m):
-	faces_norm.append(faces_matrix[i] - mean_face)
+	# hitung mean face
+	mean_face = np.mean(faces_matrix, axis=0)
 
-faces_norm = np.array(faces_norm)
-# faces_norm adalah "normal" dari wajah
-faces_norm = np.transpose(faces_norm)
-# faces_matrix -> N^2 x M
+	faces_norm = []
+	# "normal"kan wajah training (face - average face)
+	for i in range(m):
+		faces_norm.append(faces_matrix[i] - mean_face)
 
-# C = A^T x A
-C = np.transpose(faces_norm) @ faces_norm
-# Matriks kovarian, C -> M x M
+	faces_norm = np.array(faces_norm)
+	# faces_norm adalah "normal" dari wajah
+	faces_norm = np.transpose(faces_norm)
+	# faces_matrix -> N^2 x M
 
-print("Processing eigenvalues...")
-# Hitung nilai eigen dan vektor eigen C
-EigVal, EigVect = eigen(C, iteration=15000)
-# EigVect adalah matriks dengan entri kolom ke-i vektor basis yang berkoresponden dengan nilai eigen ke-i EigVal
+	# C = A^T x A
+	C = np.transpose(faces_norm) @ faces_norm
+	# Matriks kovarian, C -> M x M
 
-print("Processing eigenfaces...")
-# EigFace adalah matriks wajah-wajah eigen, dengan entri baris adalah vektor wajah
-EigFace = []
-for i in range(m):
-	EigFace.append(faces_norm @ EigVect[:,i])
-	EigFace[i] = EigFace[i]/(np.linalg.norm(EigFace))
+	print("Processing eigenvalues...")
+	# Hitung nilai eigen dan vektor eigen C
+	EigVal, EigVect = eigen(C, iteration=15000)
+	# EigVect adalah matriks dengan entri kolom ke-i vektor basis yang berkoresponden dengan nilai eigen ke-i EigVal
 
-EigFace = np.array(EigFace)
-# EigFace -> M x N^2
+	print("Processing eigenfaces...")
+	# EigFace adalah matriks wajah-wajah eigen, dengan entri baris adalah vektor wajah
+	EigFace = []
+	for i in range(m):
+		EigFace.append(faces_norm @ EigVect[:,i])
+		EigFace[i] = EigFace[i]/(np.linalg.norm(EigFace))
 
-# for i in range(m):
-# 	for j in range(i,m):
-# 		print(np.dot(EigFace[i], EigFace[j]))
+	EigFace = np.array(EigFace)
+	# EigFace -> M x N^2
 
-# nyatakan wajah-wajah sebagai kombinasi linier dalam Om
-Om = []
-for i in range(m):
-	Om.append([np.dot(faces_norm[:,i], u) for u in EigFace])	# menghasilkan konstanta kelipatan suatu vektor eigen sebagai komponennya
+	# for i in range(m):
+	# 	for j in range(i,m):
+	# 		print(np.dot(EigFace[i], EigFace[j]))
 
-Om = np.array(Om)
+	# nyatakan wajah-wajah sebagai kombinasi linier dalam Om
+	Om = []
+	for i in range(m):
+		Om.append([np.dot(faces_norm[:,i], u) for u in EigFace])	# menghasilkan konstanta kelipatan suatu vektor eigen sebagai komponennya
 
-print("Pre-processing complete")
-pict = input()
-while(pict != "stop"):
-	img = im.open("../test/"+pict).convert("L")
+	Om = np.array(Om)
+
+	print("Training complete")
+
+	return pict_name, mean_face, EigFace, Om
+
+
+def test_image(path, pict_name, mean_face, EigFace, Om):
+	img = im.open(path).convert("L")
 	img = img.resize((256,256), im.BICUBIC)
 	img = np.array(img).flatten()
 
@@ -77,15 +83,13 @@ while(pict != "stop"):
 	Omk = [np.dot(NewFace, u) for u in EigFace]
 	Omk = np.array(Omk)
 
+	m = len(EigFace)
 	min = 99999999
 	k = -1
 	for i in range(m):
 		epsilon = np.linalg.norm(Omk - Om[i])
-		# print(faces_norm[:,i], "\n", NewFace, "\n-------")
-		# print(faces_matrix[i], "\n", img, "\n########\n")
 		if(epsilon < min):
 			min = epsilon
 			k = i
 
-	print(k)
-	pict = input()
+	return pict_name[k]
