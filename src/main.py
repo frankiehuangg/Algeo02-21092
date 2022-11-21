@@ -8,18 +8,76 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
-from openfile import select_file, select_dir
+from tkinter import filedialog as fd
+
+import numpy as np
+import shutil as sh
+from PIL import Image, ImageTk
+from image_processing import train_images, test_image
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets/frame0")
 
 
+
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+def select_dir():
+    filepath = fd.askdirectory(
+        initialdir="../",
+        title='Choose directory'
+    )
+
+    if (len(filepath) != 0):
+        pict_path, mean_face, EigFace, Om = train_images(filepath)
+        np.savetxt("data/pict_path.txt", pict_path, fmt="%s")
+        np.savetxt("data/mean_face.txt", mean_face)
+        np.savetxt("data/EigFace.txt", EigFace)
+        np.savetxt("data/Om.txt", Om)
+
+def select_file():
+    pict_path = np.genfromtxt("data/pict_path.txt", dtype="str", delimiter="\n")
+    mean_face = np.loadtxt("data/mean_face.txt")
+    EigFace = np.loadtxt("data/EigFace.txt")
+    Om = np.loadtxt("data/Om.txt")
+    if (len(mean_face) != 0):
+        filetypes = ( 
+            ("Image files", "*.png"),
+            ("Image files", "*.jpg"),
+            ("All files", "*.*")
+        )
+
+        filename = fd.askopenfilename(
+            initialdir='../',
+            title='Choose file',
+            filetypes=filetypes
+        )
+
+        if (len(filename) != 0):
+            img = Image.open(filename).resize((256,256))
+            img = ImageTk.PhotoImage(img)
+            canvas.itemconfigure(image_2, image=img)
+            # image_2.configure(image=img)
+            # img = PhotoImage(file=filename)
+            # canvas.itemconfig(image_2, image=img)
+
+            output = test_image(filename, pict_path, mean_face, EigFace, Om)
+
+            print(output)
+
+            img = Image.open(output).resize((256,256), Image.BICUBIC)
+            img = ImageTk.PhotoImage(img)
+            canvas.itemconfig(image_3, image=img)
+
+    else:
+        print("Silahkan lakukan training terlebih dahulu!")
+
 
 
 window = Tk()
 
+window.title("Image Recognition")
 window.geometry("960x540")
 window.configure(bg = "#FFFFFF")
 
@@ -33,6 +91,7 @@ canvas = Canvas(
     highlightthickness = 0,
     relief = "ridge"
 )
+canvas.pack()
 
 canvas.place(x = 0, y = 0)
 image_image_1 = PhotoImage(
