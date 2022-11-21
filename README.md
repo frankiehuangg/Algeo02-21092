@@ -1,10 +1,14 @@
-# Project Name
+# Face Recognition with EigenFace method
 > Tugas Besar 2 IF 2123 Aljabar Linier dan Geometri
+> 
 > Aplikasi Nilai **Eigen** dan **EigenFace** pada Pengenalan Wajah (Face Recognition)
-> ***link video***
+> 
+> Oleh Kelompok 40 - DigOldBicks
+> 
+> [Video Aplikasi](https://www.youtube.com/watch?v=dQw4w9WgXcQ) <!-- jangan lupa ganti ke video tubes -->
 
 ## Daftar isi
-* [Tentang Tubes](#tentang-tubes)
+* [Tentang Proyek](#tentang-proyek)
 * [Fitur](#fitur)
 * [Screenshots](#screenshots)
 * [Requirement](#requirement)
@@ -15,7 +19,7 @@
 * [Acknowledgements](#acknowledgements)
 
 
-## Tentang Tubes
+## Tentang Proyek
 - Teknologi *face recognition* sederhana menggunakan nilai eigen dan EigenFace
 - Penggunaan EigenFace memungkinkan pencocokan wajah tanpa membutuhkan fitur-fitur wajah, serta relatif mudah diimplementasikan
 - Penggunaan program face recognition dengan EigenFace membutuhkan pencahayaan yang baik dan posisi wajah yang tepat di tengah gambar
@@ -50,7 +54,8 @@ Pastikan telah ter-instal python dan library-library yang diperlukan pada [Requi
 
 ## Status Proyek
 Proyek telah: _selesai_.
-*Tidak terdapat rencana dalam jangka waktu dekat untuk perubahan, penambahan, maupun optimisasi program dalam jangka waktu dekat.*
+
+*Tidak ada rencana perubahan, penambahan, maupun optimisasi program dalam jangka waktu dekat.*
 
 
 ## Room for Improvement
