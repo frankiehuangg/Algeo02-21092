@@ -19,7 +19,7 @@ def polyKofaktor(M):
     else:
         minorMat = [[0 for i in range(dim-1)] for i in range(dim-1)]
         polyEq = 0
-        for i in range(dim):
+        for i in range(dim):    
             # Copy matriks minor
             for j in range(1, dim):
                 for k in range(i):
