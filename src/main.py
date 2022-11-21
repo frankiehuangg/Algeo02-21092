@@ -11,7 +11,10 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import filedialog as fd
 
 import numpy as np
-import shutil as sh
+import cv2
+import time
+from os.path import exists
+from cv2 import VideoCapture
 from PIL import Image, ImageTk
 from image_processing import train_images, test_image
 
@@ -20,8 +23,21 @@ ASSETS_PATH = OUTPUT_PATH / Path(r"assets/frame0")
 
 
 
+def load_data():
+    pict_path = np.genfromtxt("data/pict_path.txt", dtype="str", delimiter="\n")
+    mean_face = np.loadtxt("data/mean_face.txt")
+    EigFace = np.loadtxt("data/EigFace.txt")
+    Om = np.loadtxt("data/Om.txt")
+
+    return pict_path, mean_face, EigFace, Om
+
+if (exists("data/pict_path.txt")):
+    pict_path, mean_face, EigFace, Om = load_data()
+
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
+
+load_time = 0
 
 def select_dir():
     filepath = fd.askdirectory(
@@ -30,17 +46,31 @@ def select_dir():
     )
 
     if (len(filepath) != 0):
+        start = time.time()
+
         pict_path, mean_face, EigFace, Om = train_images(filepath)
         np.savetxt("data/pict_path.txt", pict_path, fmt="%s")
         np.savetxt("data/mean_face.txt", mean_face)
         np.savetxt("data/EigFace.txt", EigFace)
         np.savetxt("data/Om.txt", Om)
 
+        load_data()
+
+        load_time = str(round(time.time() - start, 5))
+
+        canvas.itemconfig(exec_time, text=load_time)
+
+is_input = True
+
+def change_image(img, path):
+    global image_image_2
+    global image_image_3
+
+    image_image_2.paste(img)
+    img = Image.open(path).resize((256,256), Image.BICUBIC)
+    image_image_3.paste(img)
+
 def select_file():
-    pict_path = np.genfromtxt("data/pict_path.txt", dtype="str", delimiter="\n")
-    mean_face = np.loadtxt("data/mean_face.txt")
-    EigFace = np.loadtxt("data/EigFace.txt")
-    Om = np.loadtxt("data/Om.txt")
     if (len(mean_face) != 0):
         filetypes = ( 
             ("Image files", "*.png"),
@@ -55,24 +85,48 @@ def select_file():
         )
 
         if (len(filename) != 0):
-            img = Image.open(filename).resize((256,256))
-            img = ImageTk.PhotoImage(img)
-            canvas.itemconfigure(image_2, image=img)
-            # image_2.configure(image=img)
-            # img = PhotoImage(file=filename)
-            # canvas.itemconfig(image_2, image=img)
+            img = Image.open(filename).resize((256,256), Image.BICUBIC)
 
-            output = test_image(filename, pict_path, mean_face, EigFace, Om)
-
-            print(output)
-
-            img = Image.open(output).resize((256,256), Image.BICUBIC)
-            img = ImageTk.PhotoImage(img)
-            canvas.itemconfig(image_3, image=img)
-
+            output = test_image(img, pict_path, mean_face, EigFace, Om)
+            
+            change_image(img, output)
     else:
         print("Silahkan lakukan training terlebih dahulu!")
 
+def run_camera():
+    global image_image_2
+    global canvas
+
+    if (len(mean_face) != 0):
+        if (not is_input):
+            cv2image= cv2.cvtColor(cam.read()[1],cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(cv2image).crop((80,0,560,480))
+
+            output = test_image(img, pict_path, mean_face, EigFace, Om)
+
+            change_image(img, output)
+
+            canvas.after(20, run_camera)
+    else:
+        print("Silahkan lakukan training terlebih dahulu!")
+
+def change_mode():
+    global is_input
+    global image_image_2
+
+    if is_input:
+        button_3.config(text="Camera Mode")
+        is_input = False
+        run_camera()
+    else:
+        button_3.config(text="Input Mode")
+        is_input = True
+        img = Image.open("assets/frame0/image_2.png")
+        image_image_2.paste(img)
+
+
+
+cam = VideoCapture(0)
 
 
 window = Tk()
@@ -80,6 +134,7 @@ window = Tk()
 window.title("Image Recognition")
 window.geometry("960x540")
 window.configure(bg = "#FFFFFF")
+window.resizable(False, False)
 
 
 canvas = Canvas(
@@ -102,10 +157,8 @@ image_1 = canvas.create_image(
     image=image_image_1
 )
 
-button_image_1 = PhotoImage(
-    file=relative_to_assets("button_1.png"))
 button_1 = Button(
-    image=button_image_1,
+    text="Choose File",
     borderwidth=0,
     highlightthickness=0,
     command=select_file,
@@ -118,10 +171,8 @@ button_1.place(
     height=32.0
 )
 
-button_image_2 = PhotoImage(
-    file=relative_to_assets("button_2.png"))
 button_2 = Button(
-    image=button_image_2,
+    text="Choose Directory",
     borderwidth=0,
     highlightthickness=0,
     command=select_dir,
@@ -132,6 +183,20 @@ button_2.place(
     y=446.0,
     width=140.0,
     height=32.0
+)
+
+button_3 = Button(
+    text="Input Mode",
+    borderwidth=0,
+    highlightthickness=0,
+    command=change_mode,
+    relief="flat"
+)
+button_3.place(
+    x=415.0,
+    y=200.0,
+    width=130.0,
+    height=32.0,
 )
 
 canvas.create_text(
@@ -152,14 +217,14 @@ canvas.create_text(
     font=("K2D Light", 18 * -1)
 )
 
-canvas.create_text(
-    581.0,
-    412.0,
-    anchor="nw",
-    text="Result",
-    fill="#FFFFFF",
-    font=("K2D Light", 18 * -1)
-)
+# canvas.create_text(
+#     581.0,
+#     412.0,
+#     anchor="nw",
+#     text="Result",
+#     fill="#FFFFFF",
+#     font=("K2D Light", 18 * -1)
+# )
 
 canvas.create_text(
     777.0,
@@ -170,7 +235,16 @@ canvas.create_text(
     font=("K2D Light", 18 * -1)
 )
 
-image_image_2 = PhotoImage(
+exec_time = canvas.create_text(
+    777.0,
+    448.0,
+    anchor="nw",
+    text="0",
+    fill="#FFFFFF",
+    font=("K2D Light", 18 * -1)
+)
+
+image_image_2 = ImageTk.PhotoImage(
     file=relative_to_assets("image_2.png"))
 image_2 = canvas.create_image(
     250.0,
@@ -178,7 +252,7 @@ image_2 = canvas.create_image(
     image=image_image_2
 )
 
-image_image_3 = PhotoImage(
+image_image_3 = ImageTk.PhotoImage(
     file=relative_to_assets("image_3.png"))
 image_3 = canvas.create_image(
     715.0,
@@ -220,5 +294,5 @@ canvas.create_text(
     fill="#FFFFFF",
     font=("Kadwa Regular", 18 * -1)
 )
-window.resizable(False, False)
+
 window.mainloop()
