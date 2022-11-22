@@ -33,8 +33,13 @@ Program dapat menjalankan fitur-fitur:
 
 
 ## Screenshots
-![Example screenshot](./img/screenshot.png)
-<!-- If you have screenshots you'd like to share, include them here. -->
+![Screenshot 1: Gambar testing berasal dari dataset](./screenshots/Screenshot1_gambar_dalam_dataset.png)
+
+![Screenshot 2: Gambar testing berasal dari luar dataset, namun wajah orang terdapat dalam dataset](./screenshots/Screenshot2_gambar_luar_dataset-wajah_dalam_dataset.png)
+
+![Screenshot 3: Gambar testing berasal dari luar dataset, namun wajah orang tidak terdapat dalam dataset](./screenshots/Screenshot3_wajah_luar_dataset.png)
+
+![Screenshot 4: Gambar testing berasal dari kamera](./screenshots/Screenshot4_wajah_dari_kamera.png)
 
 
 ## Requirement
@@ -49,8 +54,19 @@ Pastikan telah ter-instal python dan library-library yang diperlukan pada [Requi
 
 
 ## Usage
-<!-- How does one go about using it? -->
-<!-- Provide various use cases and code examples here. -->
+### Starting
+Pada directory src, jalankan ```py main.py``` pada console (atau, pada main.py anda dapat memilih pilihan **Open With** -> **Python**).
+
+Setelah program berjalan, klik "Choose Directory", kemudian pilih folder yang berisi gambar-gambar training.
+
+Setelah tahap pre-processing selesai, anda dapat meng-klik tombol "Input Mode" atau "Camera Mode" - tulisan yang ditamppilkan tergantung mode saat ini. Meng-klik tombol tersebut akan mengganti mode program ke mode sebaliknya.
+
+### Input Mode
+Pilih gambar yang akan anda cocokkan dengan wajah dari dataset, output gambar yang paling mendekati dari dataset akan ditampilkan pada bingkai sebelah kanan.
+
+### Camera Mode
+Camera mode akan menerima input dari kamera perangkat anda, output gambar yang paling mendekati dari dataset akan ditampilkan pada bingkai sebelah kanan.
+
 
 ## Status Proyek
 Proyek telah: _selesai_.
