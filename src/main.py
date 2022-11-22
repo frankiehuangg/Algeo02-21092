@@ -11,10 +11,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import filedialog as fd
 
 import numpy as np
-import cv2
-import time
-import os
-from cv2 import VideoCapture
+import cv2, time, os
 from PIL import Image, ImageTk
 from image_processing import train_images, test_image
 
@@ -92,8 +89,8 @@ def select_file():
     # Else if in input mode, check if file is empty
     elif (len(mean_face) != 0):
         filetypes = ( 
-            ("PNG files", "*.png"),
             ("JPG files", "*.jpg"),
+            ("PNG files", "*.png"),
             ("All files", "*.*")
         )
 
@@ -152,7 +149,7 @@ def change_mode():
 
 
 
-cam = VideoCapture(0)
+cam = cv2.VideoCapture(0)
 
 
 window = Tk()
