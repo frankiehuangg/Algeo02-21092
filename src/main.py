@@ -13,7 +13,7 @@ from tkinter import filedialog as fd
 import numpy as np
 import cv2
 import time
-from os.path import exists
+import os
 from cv2 import VideoCapture
 from PIL import Image, ImageTk
 from image_processing import train_images, test_image
@@ -22,8 +22,13 @@ OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets/frame0")
 
 
-
+# Load data from files
 def load_data():
+    global pict_path
+    global mean_face
+    global EigFace
+    global Om
+
     pict_path = np.genfromtxt("data/pict_path.txt", dtype="str", delimiter="\n")
     mean_face = np.loadtxt("data/mean_face.txt")
     EigFace = np.loadtxt("data/EigFace.txt")
@@ -31,37 +36,46 @@ def load_data():
 
     return pict_path, mean_face, EigFace, Om
 
-if (exists("data/pict_path.txt")):
+# Check if data exists, if so; load from file
+if (os.path.exists("data/pict_path.txt")):
     pict_path, mean_face, EigFace, Om = load_data()
 
+# Return relative path to assets/
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
 load_time = 0
 
+# Iterate through directory, load images
 def select_dir():
     filepath = fd.askdirectory(
         initialdir="../",
         title='Choose directory'
     )
 
-    if (len(filepath) != 0):
-        start = time.time()
+    # If file not empty, load
+    # if (len(mean_face) != 0):
+    start = time.time()
 
-        pict_path, mean_face, EigFace, Om = train_images(filepath)
-        np.savetxt("data/pict_path.txt", pict_path, fmt="%s")
-        np.savetxt("data/mean_face.txt", mean_face)
-        np.savetxt("data/EigFace.txt", EigFace)
-        np.savetxt("data/Om.txt", Om)
+    pict_path, mean_face, EigFace, Om = train_images(filepath)
 
-        load_data()
+    if (not os.path.exists("data/")):
+        os.makedirs("data/")
 
-        load_time = str(round(time.time() - start, 5))
+    np.savetxt("data/pict_path.txt", pict_path, fmt="%s")
+    np.savetxt("data/mean_face.txt", mean_face)
+    np.savetxt("data/EigFace.txt", EigFace)
+    np.savetxt("data/Om.txt", Om)
 
-        canvas.itemconfig(exec_time, text=load_time)
+    load_data()
+
+    load_time = str(round(time.time() - start, 5))
+
+    canvas.itemconfig(exec_time, text=load_time)
 
 is_input = True
 
+# Change image in Test Image and Closest Result
 def change_image(img, path):
     global image_image_2
     global image_image_3
@@ -70,11 +84,16 @@ def change_image(img, path):
     img = Image.open(path).resize((256,256), Image.BICUBIC)
     image_image_3.paste(img)
 
+# Select an image file
 def select_file():
-    if (len(mean_face) != 0):
+    # If in camera mode, don't run
+    if (not is_input):
+        print("Silahkan ganti mode terlebih dahulu!")
+    # Else if in input mode, check if file is empty
+    elif (len(mean_face) != 0):
         filetypes = ( 
-            ("Image files", "*.png"),
-            ("Image files", "*.jpg"),
+            ("PNG files", "*.png"),
+            ("JPG files", "*.jpg"),
             ("All files", "*.*")
         )
 
@@ -84,6 +103,7 @@ def select_file():
             filetypes=filetypes
         )
 
+        # If path is valid, run test_image
         if (len(filename) != 0):
             img = Image.open(filename).resize((256,256), Image.BICUBIC)
 
@@ -93,23 +113,29 @@ def select_file():
     else:
         print("Silahkan lakukan training terlebih dahulu!")
 
+# Run camera
 def run_camera():
     global image_image_2
     global canvas
 
-    if (len(mean_face) != 0):
-        if (not is_input):
-            cv2image= cv2.cvtColor(cam.read()[1],cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(cv2image).crop((80,0,560,480))
+    # If in input mode, don't run
+    if (is_input):
+        print("Silahkan ganti mode terlebih dahulu!")
+    # Else if in camera mode, check if file is empty
+    elif (len(mean_face) != 0):
+        # if (not is_input):
+        cv2image= cv2.cvtColor(cam.read()[1],cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(cv2image).crop((80,0,560,480))
 
-            output = test_image(img, pict_path, mean_face, EigFace, Om)
+        output = test_image(img, pict_path, mean_face, EigFace, Om)
 
-            change_image(img, output)
+        change_image(img, output)
 
-            canvas.after(20, run_camera)
+        canvas.after(20, run_camera)
     else:
         print("Silahkan lakukan training terlebih dahulu!")
 
+# Change button text
 def change_mode():
     global is_input
     global image_image_2
@@ -216,15 +242,6 @@ canvas.create_text(
     fill="#FFFFFF",
     font=("K2D Light", 18 * -1)
 )
-
-# canvas.create_text(
-#     581.0,
-#     412.0,
-#     anchor="nw",
-#     text="Result",
-#     fill="#FFFFFF",
-#     font=("K2D Light", 18 * -1)
-# )
 
 canvas.create_text(
     777.0,
