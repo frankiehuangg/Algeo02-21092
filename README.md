@@ -27,8 +27,9 @@
 
 ## Fitur
 Program dapat menjalankan fitur-fitur:
-- Face recognition sebuah file gambar
-- Face recognition melalui kamera
+- Pengenalan wajah dari sebuah file gambar
+- Pengenalan wajah melalui kamera
+
 **Perlu diperhatikan bahwa dataset pengenalan wajah perlu disediakan sendiri**
 
 
