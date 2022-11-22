@@ -61,7 +61,6 @@ Proyek telah: _selesai_.
 ## Room for Improvement
 Room for improvement:
 - Algoritma QR untuk mencari nilai eigen dapat dioptimisasi dengan mengkonversi matriks masukan ke dalam bentuk *upper hessenberg matrix*, yang dapat mengurangi jumlah iterasi untuk mencapai kekonvergenan nilai eigen.
-- Dapat ditambahkan modul untuk menyimpan data-data pre-processing dataset untuk mempercepat proses pre-process untuk dataset yang sama pada saat program dijalankan selanjutnya.
 
 
 ## Acknowledgements
