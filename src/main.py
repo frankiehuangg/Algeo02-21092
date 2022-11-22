@@ -122,7 +122,13 @@ def run_camera():
     elif (len(mean_face) != 0):
         # if (not is_input):
         cv2image= cv2.cvtColor(cam.read()[1],cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(cv2image).crop((80,0,560,480))
+
+        img = Image.fromarray(cv2image)
+
+        width, height = img.size
+        diff = width - height
+
+        img = img.crop((diff,0,diff+height,height))
 
         output = test_image(img, pict_path, mean_face, EigFace, Om)
 
